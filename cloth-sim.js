@@ -92,6 +92,13 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+document.addEventListener("click", (event) => {
+
+    i++;
+    mode = modes[i % 2];
+
+});
+
 const lockedPoints = [];
 
 function createMesh() {
