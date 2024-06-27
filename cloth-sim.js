@@ -8,20 +8,20 @@ function normalize(vector) {
 }
 
 let mesh = [];
+let points = [];
+let sticks = [];
 cols = 50;
 rows = 40;
 
-for (let i = 0; i < rows; ++i) {
-  array = [];
-  for (let j = 0; j < cols; ++j) {
-    
-    if (i == 0) {
-      array.push(!(j % 6));
-    } else {
-      array.push(0);
-    }
+for (let j = 0; j < rows; ++j) {
+  let meshRow = [];
+  let pointsRow = [];
+  for (let i = 0; i < cols; ++i) {
+    meshRow.push(j == 0 && !(i % 6));
+    pointsRow.push(null);
   }
-  mesh.push(array);
+  mesh.push(meshRow);
+  points.push(pointsRow);
 }
 
 class Vector2 {
@@ -72,13 +72,7 @@ ctx = canvas.getContext("2d");
 
 let numIterations = 3;
 
-const points = [];
-const sticks = [];
-
-let offset = new Vector2(
-  canvas.width / cols,
-  canvas.height / rows/1.5
-);
+let offset = new Vector2(canvas.width / cols, canvas.height / rows / 1.5);
 
 const modes = ["0", "1"];
 let mode = "0";
@@ -94,70 +88,71 @@ document.addEventListener("keydown", (event) => {
 
 var button = document.getElementById("Button");
 
-    button.addEventListener("click", function() {
-      i++;
-      mode = modes[i % 2];  
-    });
+button.addEventListener("click", function () {
+  i++;
+  mode = modes[i % 2];
+});
 
 const lockedPoints = [];
 
 function createMesh() {
-  for (let j = 0; j < mesh.length; j++) {
-    for (let i = 0; i < mesh[j].length; i++) {
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i < cols; i++) {
       const point = new Point(
-        new Vector2(i * offset.x + offset.x / 2 , j * offset.y + offset.y / 2 )
+        new Vector2(i * offset.x + offset.x / 2, j * offset.y + offset.y / 2)
       );
       if (mesh[j][i]) {
         point.locked = true;
       }
-      points.push(point);
+      points[j][i] = point;
+
       if (i >= 1) {
-        sticks.push(
-          new Stick(
-            points[j * mesh[j].length + i],
-            points[j * mesh[j].length + (i - 1)]
-          )
-        );
+        sticks.push(new Stick(points[j][i], points[j][i - 1]));
       }
+
       if (j >= 1) {
-        sticks.push(
-          new Stick(
-            points[j * mesh[j].length + i],
-            points[(j - 1) * mesh[j - 1].length + i]
-          )
-        );
+        sticks.push(new Stick(points[j][i], points[j - 1][i]));
       }
     }
   }
-  for (let i = 0; i < points.length; ++i) {
-    if (points[i].locked) {
-      lockedPoints.push(points[i]);
+
+  for (let j = 0; j < rows; ++j) {
+    for (let i = 0; i < cols; ++i) {
+      if (points[j][i].locked) {
+        lockedPoints.push(points[j][i]);
+      }
     }
   }
 }
 
 function simulate(deltaTime) {
-  for (let i = 0; i < points.length; i++) {
-    p = points[i];
-    if (!p.locked) {
-      let positionBeforeUpdate = p.position;
-      p.position = p.position.add(p.position.subtract(p.prevPosition));
-      p.position = p.position.add((new Vector2(0, 1)).extend(gravity * deltaTime));
-      p.prevPosition = positionBeforeUpdate;
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i< cols; i++) {
+      p = points[j][i];
+      if (!p.locked) {
+        let positionBeforeUpdate = p.position;
+        p.position = p.position.add(p.position.subtract(p.prevPosition));
+        p.position = p.position.add(
+          new Vector2(0, 1).extend(gravity * deltaTime)
+        );
+        p.prevPosition = positionBeforeUpdate;
+      }
     }
   }
 
   for (let j = 0; j < numIterations; j++) {
     for (let i = 0; i < sticks.length; ++i) {
       s = sticks[i];
-      stickCentre = s.pointA.position.add(s.pointB.position).extend(.5);
+      stickCentre = s.pointA.position.add(s.pointB.position).extend(0.5);
       stickDir = normalize(s.pointA.position.subtract(s.pointB.position));
 
       if (!s.pointA.locked) {
-        s.pointA.position = stickCentre.add((stickDir).extend(s.length*.5));
+        s.pointA.position = stickCentre.add(stickDir.extend(s.length * 0.5));
       }
       if (!s.pointB.locked) {
-        s.pointB.position = stickCentre.subtract((stickDir).extend(s.length*.5));
+        s.pointB.position = stickCentre.subtract(
+          stickDir.extend(s.length * 0.5)
+        );
       }
     }
   }
@@ -171,10 +166,8 @@ let currTime = 0;
 function update(time) {
   currTime += (time - lastTime) / 1000;
   while (currTime > deltaTime) {
-
     ctx.fillStyle = "#92d1a3";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
 
     let radius = 2;
     for (let i = 0; i < sticks.length; ++i) {
