@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    body {
+        overflow: hidden;
+      margin: 0;
+      background-color: rgb(0, 128, 255);
+    }
+    h1{
+        color: white;
+        text-align: center;
+        font-family:Verdana, Geneva, Tahoma, sans-serif;
+    }
+    #canvas {
+        margin: 50px auto auto auto;
+      display: block;
+    }
+    footer>p{
+        position: relative;
+        color: white;
+        bottom: 20px;
+        text-align: right;
+        margin-right: 20px;
+    }
+    a{
+        text-decoration: none;
+        color: white;
+        font-family: "Montserrat";
+    }
+    canvas{
+        border: 2px solid rgb(255, 255, 255) ;
+        border-radius: 10px;
+        padding: 10px;
+    }
+  </style>
+  <body>
+    <h1>Cloth Simulation Using Javascript</h1>
+    <canvas
+      id="canvas"
+      width="800px"
+      height="500px"
+      
+    ></canvas>
+  </body>
+<footer>
+    <p>©️ <a href="https://www.youtube.com/watch?v=3HjO_RGIjCU" target="_blank">Coding Math </a></p>
+    <p>©️ <a href="https://www.youtube.com/watch?v=PGk0rnyTa1U&t=529s" target="_blank">Sebastian Lague</a></p>
+</footer>
+  <script src="cloth-sim.js"></script>
+</html>
