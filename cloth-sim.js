@@ -92,12 +92,12 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-document.addEventListener("click", (event) => {
+var button = document.getElementById("Button");
 
-    i++;
-    mode = modes[i % 2];
-
-});
+    button.addEventListener("click", function() {
+      i++;
+      mode = modes[i % 2];  
+    });
 
 const lockedPoints = [];
 
